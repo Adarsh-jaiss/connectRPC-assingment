@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"encoding/json"
 
 	connect "connectrpc.com/connect"
 	__ "github.com/adarsh-jaiss/grpc-assingment/types"
@@ -42,15 +43,58 @@ func (s *TwitterServiceServer) GetTweets(ctx context.Context, req *connect.Reque
 	return tweetsResponse, nil
 }
 
+
 func (s *TwitterServiceServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Implement the logic for handling HTTP requests here
+    switch r.URL.Path {
+    case "/user":
+        s.handleGetUser(w, r)
+    case "/tweets":
+        s.handleGetTweets(w, r)
+    default:
+        http.NotFound(w, r)
+    }
+}
+
+
+func (s *TwitterServiceServer) handleGetUser(w http.ResponseWriter, r *http.Request) {
+    userResponse, err := s.GetUser(r.Context(), nil)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    jsonResponse, err := json.Marshal(userResponse)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(jsonResponse)
+}
+
+func (s *TwitterServiceServer) handleGetTweets(w http.ResponseWriter, r *http.Request) {
+    tweetsResponse, err := s.GetTweets(r.Context(), nil)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    jsonResponse, err := json.Marshal(tweetsResponse)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.Write(jsonResponse)
 }
 
 func main() {
 	server := &TwitterServiceServer{} // Assuming you have defined your server struct as Server
 	mux := http.NewServeMux()
-	mux.Handle("/getUser", server)
-	mux.Handle("/getTweets", server)
+	mux.Handle("/user", server)
+	mux.Handle("/tweets", server)
 	listenAddr := flag.String("listenAddr", ":8080", "The address to listen on for gRPC requests.")
 	flag.Parse()
 	fmt.Printf("running a new server at port : %s", *listenAddr)
