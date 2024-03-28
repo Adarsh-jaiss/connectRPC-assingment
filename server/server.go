@@ -91,10 +91,12 @@ func (s *TwitterServiceServer) handleGetTweets(w http.ResponseWriter, r *http.Re
 }
 
 func main() {
-	server := &TwitterServiceServer{} // Assuming you have defined your server struct as Server
+	server := &TwitterServiceServer{} 
 	mux := http.NewServeMux()
-	mux.Handle("/user", server)
-	mux.Handle("/tweets", server)
+	path, handler := pb.NewTwitterServiceHandler(server)
+	mux.Handle(path, handler)
+	mux.Handle("/user", http.HandlerFunc(server.handleGetUser))
+	mux.Handle("/tweets", http.HandlerFunc(server.handleGetTweets))
 	listenAddr := flag.String("listenAddr", ":8080", "The address to listen on for gRPC requests.")
 	flag.Parse()
 	fmt.Printf("running a new server at port : %s", *listenAddr)
