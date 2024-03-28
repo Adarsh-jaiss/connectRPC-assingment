@@ -1,0 +1,24 @@
+syntax = "proto3";
+option go_package = ".";
+
+service TwitterService {
+  rpc GetUser (UserRequest) returns (UserResponse);
+  rpc GetTweets (TweetsRequest) returns (TweetsResponse);
+}
+
+message UserRequest {
+  string user_id = 1;
+}
+
+message UserResponse {
+  string username = 1;
+  string bio = 2;
+}
+
+message TweetsRequest {
+  string hashtag = 1;
+}
+
+message TweetsResponse {
+  repeated string tweets = 1;
+}
