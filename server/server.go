@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
 	connect "connectrpc.com/connect"
 	__ "github.com/adarsh-jaiss/grpc-assingment/types"
-	pb "github.com/adarsh-jaiss/grpc-assingment/types/__connect"
+	pb "github.com/adarsh-jaiss/grpc-assingment/types/typesconnect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -47,6 +49,10 @@ func (s *TwitterServiceServer) ServeHTTP(w http.ResponseWriter, r *http.Request)
 func main() {
 	server := &TwitterServiceServer{} // Assuming you have defined your server struct as Server
 	mux := http.NewServeMux()
-	mux.Handle("/connectrpc.com/connect.TwitterService/", server)
-	log.Fatal(http.ListenAndServe(":8080", h2c.NewHandler(mux, &http2.Server{})))
+	mux.Handle("/getUser", server)
+	mux.Handle("/getTweets", server)
+	listenAddr := flag.String("listenAddr", ":8080", "The address to listen on for gRPC requests.")
+	flag.Parse()
+	fmt.Printf("running a new server at port : %s", *listenAddr)
+	log.Fatal(http.ListenAndServe(*listenAddr, h2c.NewHandler(mux, &http2.Server{})))
 }

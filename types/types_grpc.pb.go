@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v3.12.4
-// source: types/models.proto
+// source: types/types.proto
 
-package __
+package types
 
 import (
 	context "context"
@@ -142,5 +142,5 @@ var TwitterService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "types/models.proto",
+	Metadata: "types/types.proto",
 }
